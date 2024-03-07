@@ -6,15 +6,12 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
 TARGET = PropertyEditor
-TEMPLATE = app
+TEMPLATE = lib
 
-
-SOURCES += main.cpp\
-        testwidget.cpp \
-    CPropertyEditor.cpp \
+SOURCES += CPropertyEditor.cpp \
     CBoolProperty.cpp \
     CBaseProperty.cpp \
     CIntegerProperty.cpp \
@@ -30,8 +27,7 @@ SOURCES += main.cpp\
     CTimeProperty.cpp \
     CDateTimeProperty.cpp
 
-HEADERS  += testwidget.h \
-    CPropertyEditor.h \
+HEADERS  += CPropertyEditor.h \
     CBoolProperty.h \
     CBaseProperty.h \
     CIntegerProperty.h \
@@ -47,9 +43,4 @@ HEADERS  += testwidget.h \
     CTimeProperty.h \
     CDateTimeProperty.h
 
-FORMS    += testwidget.ui
-
 INCLUDEPATH += .
-
-RESOURCES += \
-    testwidget.qrc

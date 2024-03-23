@@ -34,7 +34,7 @@ public:
     virtual void validateValue() {}
     virtual void displayValue() {}
 
-    virtual QWidget* createEditor() const { return NULL; }
+    virtual QWidget* createEditor() { return NULL; }
     virtual void valueToEditor() {}
     virtual void valueFromEditor() {}
     virtual void startEdit();

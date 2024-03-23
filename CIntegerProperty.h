@@ -20,7 +20,7 @@ public:
     virtual void displayValue();
     virtual void validateValue();
 
-    virtual QWidget* createEditor() const;
+    virtual QWidget* createEditor();
     virtual void valueToEditor();
     virtual void valueFromEditor();
     virtual void startEdit();
@@ -29,6 +29,11 @@ protected:
     mutable int m_value;
     int m_defaultValue;
     int m_min, m_max;
+
+private:
+    void handleEditingFinished();
+    void handleEditingCancelled();
+
 };
 
 #endif // CINTEGERPROPERTY_H

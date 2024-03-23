@@ -22,7 +22,7 @@ public:
     virtual void displayValue();
     virtual void validateValue();
 
-    virtual QWidget* createEditor() const;
+    virtual QWidget* createEditor();
     virtual void valueToEditor();
     virtual void valueFromEditor();
     virtual void startEdit();
@@ -31,6 +31,10 @@ protected:
     mutable double m_value;
     double m_defaultValue;
     double m_min, m_max;
+
+private:
+    void handleEditingFinished();
+    void handleEditingCancelled();
 };
 
 #endif // CDOUBLEPROPERTY_H

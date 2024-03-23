@@ -1,10 +1,6 @@
 #include "CIntegerProperty.h"
-
-//#include "CPropertyEditor.h" // ?
-
+#include "QExtSpinBox.h"
 #include <QDebug>
-#include <QSpinBox>
-
 
 CIntegerProperty::CIntegerProperty(const QByteArray &id, const QString &name, int value, int defaultValue, int min, int max):
     CBaseProperty(id, name),
@@ -79,9 +75,14 @@ void CIntegerProperty::validateValue()
 }
 
 
-QWidget *CIntegerProperty::createEditor() const
+QWidget *CIntegerProperty::createEditor()
 {
-    return new QSpinBox();
+    QExtSpinBox* editor = new QExtSpinBox();
+
+    editor->setOnEditingCancelled([this]() { this->handleEditingCancelled(); });
+    editor->setOnEditingFinished([this]() { this->handleEditingFinished(); });
+
+    return editor;
 }
 
 
@@ -123,4 +124,14 @@ void CIntegerProperty::startEdit()
     {
         spinEditor->selectAll();
     }
+}
+
+void CIntegerProperty::handleEditingFinished()
+{
+    finishEdit(false);
+}
+
+void CIntegerProperty::handleEditingCancelled()
+{
+    finishEdit(true);
 }

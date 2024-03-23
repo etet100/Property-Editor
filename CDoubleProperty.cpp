@@ -1,7 +1,5 @@
 #include "CDoubleProperty.h"
-
-#include <QDoubleSpinBox>
-
+#include "QExtDoubleSpinBox.h"
 
 CDoubleProperty::CDoubleProperty(const QByteArray &id, const QString &name, double value, double defaultValue, double min, double max):
     CBaseProperty(id, name),
@@ -69,10 +67,14 @@ void CDoubleProperty::validateValue()
         m_value = m_max;
 }
 
-
-QWidget *CDoubleProperty::createEditor() const
+QWidget *CDoubleProperty::createEditor()
 {
-    return new QDoubleSpinBox();
+    QExtDoubleSpinBox* editor = new QExtDoubleSpinBox();
+
+    editor->setOnEditingCancelled([this]() { this->handleEditingCancelled(); });
+    editor->setOnEditingFinished([this]() { this->handleEditingFinished(); });
+
+    return editor;
 }
 
 
@@ -113,4 +115,14 @@ void CDoubleProperty::startEdit()
     {
         spinEditor->selectAll();
     }
+}
+
+void CDoubleProperty::handleEditingFinished()
+{
+    this->finishEdit(false);
+}
+
+void CDoubleProperty::handleEditingCancelled()
+{
+    this->finishEdit(true);
 }

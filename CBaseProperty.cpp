@@ -126,7 +126,6 @@ void CBaseProperty::finishEdit(bool cancel)
     treeWidget()->setFocus();
 }
 
-
 // internal
 
 QWidget* CBaseProperty::getActiveEditor()
@@ -144,7 +143,6 @@ void CBaseProperty::setEditorPrivate()
 {
     m_editorIsPrivate = true;
 }
-
 
 void CBaseProperty::emitValueChanged()
 {

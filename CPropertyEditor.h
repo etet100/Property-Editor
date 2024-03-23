@@ -12,6 +12,7 @@ class CIntegerProperty;
 class CPropertyEditor : public QTreeWidget
 {
     Q_OBJECT
+
 public:
     explicit CPropertyEditor(QWidget *parent = 0);
 

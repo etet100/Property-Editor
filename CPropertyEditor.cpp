@@ -166,12 +166,12 @@ void CPropertyEditor::onItemChanged(QTreeWidgetItem *item, int column)
     {
         if (column)
         {
-            qDebug() << "Value state of property [" << prop->getId() << "] changed to: " << prop->getVariantValue();
+            // qDebug() << "Value state of property [" << prop->getId() << "] changed to: " << prop->getVariantValue();
         }
         else
         {
-            if (prop->isMarkable())
-                qDebug() << "Marked state of property [" << prop->getId() << "] changed to: " << prop->isMarked();
+            // if (prop->isMarkable())
+            //     qDebug() << "Marked state of property [" << prop->getId() << "] changed to: " << prop->isMarked();
         }
     }
 }

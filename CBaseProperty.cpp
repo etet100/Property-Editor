@@ -52,8 +52,12 @@ void CBaseProperty::setBackground(const QBrush &bg)
 
 void CBaseProperty::setTextColor(const QColor &color)
 {
-    QTreeWidgetItem::setTextColor(0, color);
-    QTreeWidgetItem::setTextColor(1, color);
+    QBrush brush = QTreeWidgetItem::foreground(0);
+    brush.setColor(color);
+    QTreeWidgetItem::setForeground(0, brush);
+    brush = QTreeWidgetItem::foreground(1);
+    brush.setColor(color);
+    QTreeWidgetItem::setForeground(1, brush);
 }
 
 

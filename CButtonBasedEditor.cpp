@@ -19,7 +19,7 @@ CButtonBasedEditor::CButtonBasedEditor(QWidget *hostedEditor, QWidget *parent) :
     m_button->setText("...");
     hbl->addWidget(m_button);
 
-    connect(m_button, SIGNAL(clicked()), this, SLOT(onEditButtonActivated()));
+    connect(m_button, &QAbstractButton::clicked, this, &CButtonBasedEditor::onEditButtonActivated);
 }
 
 

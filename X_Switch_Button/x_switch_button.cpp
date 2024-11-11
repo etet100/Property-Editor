@@ -30,7 +30,7 @@ X_Switch_Button::X_Switch_Button(QWidget *parent) : QWidget(parent)
 
     ani_timer = new QTimer(this);
     ani_timer->setInterval(30);
-    connect(ani_timer, SIGNAL(timeout()), this, SLOT(updateValue()));
+    connect(ani_timer, &QTimer::timeout, this, &X_Switch_Button::updateValue);
 
 #ifdef ENABLE_LOADING
     b_loading = true;

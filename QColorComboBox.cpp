@@ -19,11 +19,11 @@ QColorComboBox::QColorComboBox(QWidget *parent) :
     //connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
 
     setEditable(true);
-    connect(lineEdit(), SIGNAL(editingFinished()), this, SLOT(onEdited()));
+    connect(lineEdit(), &QLineEdit::editingFinished, this, &QColorComboBox::onEdited);
 
     // workaround of QCompleter bug (QTBUG-49165)
-    connect(lineEdit(), SIGNAL(selectionChanged()), this, SLOT(onSelectionTextChanged()));
-    connect(lineEdit(), SIGNAL(textChanged(QString&)), this, SLOT(onSelectionTextChanged()));
+    connect(lineEdit(), &QLineEdit::selectionChanged, this, &QColorComboBox::onSelectionTextChanged);
+    connect(lineEdit(), &QLineEdit::textChanged, this, &QColorComboBox::onSelectionTextChanged);
 }
 
 

@@ -31,30 +31,28 @@ void CPropertyEditor::init()
     setAlternatingRowColors(true);
     setAllColumnsShowFocus(true);
 
-
     connect(this,
-            SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+            &QTreeWidget::currentItemChanged,
             this,
-            SLOT(onCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*))
+            &CPropertyEditor::onCurrentItemChanged
     );
 
     connect(this,
-            SIGNAL(itemClicked(QTreeWidgetItem*,int)),
+            &QTreeWidget::itemClicked,
             this,
-            SLOT(onItemClicked(QTreeWidgetItem*,int))
+            &CPropertyEditor::onItemClicked
     );
 
     connect(this,
-            SIGNAL(itemChanged(QTreeWidgetItem*,int)),
+            &QTreeWidget::itemChanged,
             this,
-            SLOT(onItemChanged(QTreeWidgetItem*,int))
+            &CPropertyEditor::onItemChanged
     );
 
-    connect(qApp,
-            SIGNAL(focusChanged(QWidget*,QWidget*)),
-            this,
-            SLOT(onFocusChanged(QWidget*,QWidget*))
-            );
+    // connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)),
+    //         this,
+    //         SLOT(onFocusChanged(QWidget*,QWidget*))
+    //         );
 }
 
 

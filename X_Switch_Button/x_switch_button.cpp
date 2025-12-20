@@ -6,36 +6,35 @@
 
 X_Switch_Button::X_Switch_Button(QWidget *parent) : QWidget(parent)
 {
-    i_space = 2;
-    i_radius = 5;
-    b_checked = false;
-    b_showText = true;
-    b_animation = true;
+    m_space = 2;
+    m_radius = 5;
+    m_checked = false;
+    m_showText = true;
+    m_animation = true;
 
-    bg_color_on = QColor(0, 180, 255);
-    bg_color_off = QColor(100, 100, 100);
+    m_bgColorOn = QColor(0, 180, 255);
+    m_bgColorOff = QColor(100, 100, 100);
 
-    slider_color_on= QColor(255, 255, 255);
-    slider_color_off = QColor(255, 255, 255);
+    m_sliderColorOn= QColor(255, 255, 255);
+    m_sliderColorOff = QColor(255, 255, 255);
 
-    text_color = QColor(255, 255, 255);
+    m_textColor = QColor(255, 255, 255);
 
-    text_str_on = "开启";
-    text_str_off = "关闭";
+    m_textStrOn = "On";
+    m_textStrOff = "Off";
 
-    slide_Step = 0;
-    ani_StartX = 0;
-    ani_EndX = 0;
+    m_slideStep = 0;
+    m_aniStartX = 0;
+    m_aniEndX = 0;
 
-
-    ani_timer = new QTimer(this);
-    ani_timer->setInterval(30);
-    connect(ani_timer, &QTimer::timeout, this, &X_Switch_Button::updateValue);
+    m_aniTimer = new QTimer(this);
+    m_aniTimer->setInterval(30);
+    connect(m_aniTimer, &QTimer::timeout, this, &X_Switch_Button::updateValue);
 
 #ifdef ENABLE_LOADING
-    b_loading = true;
-    loading_color = bg_color_off;
-    ani_count = 0;
+    m_loading = true;
+    loading_color = m_bgColorOff;
+    m_aniCount = 0;
 
     m_outRadiuslist[0] = 4;
     m_outRadiuslist[1] = 3;
@@ -53,7 +52,7 @@ void X_Switch_Button::drawBackGround(QPainter *painter)
     painter->save();
     painter->setPen(Qt::NoPen);
 
-    QColor bgColor = b_checked ? bg_color_on : bg_color_off;
+    QColor bgColor = m_checked ? m_bgColorOn : m_bgColorOff;
     if ( ! isEnabled()) {
         bgColor.setAlpha(150);
     }
@@ -63,32 +62,32 @@ void X_Switch_Button::drawBackGround(QPainter *painter)
     QRect rect(0, 0, width(), height());
     int side = qMin(width(), height());
 
-    //左侧半圆
+    // Left semicircle
     QPainterPath path1;
     path1.addEllipse(rect.x(), rect.y(), side, side);
 
-    //右侧半圆
+    // Right semicircle
     QPainterPath path2;
     path2.addEllipse(rect.width() - side, rect.y(), side, side);
 
-    //中间的矩形
+    // Middle rectangle
     QPainterPath path3;
     path3.addRect(rect.x() + side / 2, rect.y(), rect.width() - side, height());
 
     QPainterPath path = path1 + path2 + path3;
     painter->drawPath(path);
 
-    //绘制文本
-    //滑块半径
-    int sliderWidth = qMin(height(), width()) - i_space * 2 - 5;
-    if (b_checked){
+    // Draw text
+    // Slider radius
+    int sliderWidth = qMin(height(), width()) - m_space * 2 - 5;
+    if (m_checked){
         QRect textRect(0, 0, width() - sliderWidth, height());
-        painter->setPen(QPen(text_color));
-        if(showText()) painter->drawText(textRect, Qt::AlignCenter, text_str_on);
+        painter->setPen(QPen(m_textColor));
+        if(showText()) painter->drawText(textRect, Qt::AlignCenter, m_textStrOn);
     } else {
         QRect textRect(sliderWidth, 0, width() - sliderWidth, height());
-        painter->setPen(QPen(text_color));
-        if(showText()) painter->drawText(textRect, Qt::AlignCenter, text_str_off);
+        painter->setPen(QPen(m_textColor));
+        if(showText()) painter->drawText(textRect, Qt::AlignCenter, m_textStrOff);
     }
 
     painter->restore();
@@ -99,12 +98,12 @@ void X_Switch_Button::drawSlider(QPainter *painter)
     painter->save();
     painter->setPen(Qt::NoPen);
 
-    QColor color = b_checked ? slider_color_on : slider_color_off;
+    QColor color = m_checked ? m_sliderColorOn : m_sliderColorOff;
 
     painter->setBrush(QBrush(color));
 
-    slider_width = qMin(width(), height()) - i_space * 2;
-    QRect rect(i_space + ani_StartX, i_space, slider_width, slider_width);
+    m_sliderWidth = qMin(width(), height()) - m_space * 2;
+    QRect rect(m_space + m_aniStartX, m_space, m_sliderWidth, m_sliderWidth);
     painter->drawEllipse(rect);
 
     painter->restore();
@@ -113,21 +112,21 @@ void X_Switch_Button::drawSlider(QPainter *painter)
 #ifdef ENABLE_LOADING
 void X_Switch_Button::startLoading()
 {
-    //设为不可点击
+    // Set as not clickable
     this->setDisabled(true);
     m_displayedWhenStopped = false;
-    ani_count = 0;
+    m_aniCount = 0;
     for (int var = 0; var < 8; var++) {
-        loading_point[var].setX(ani_StartX + m_rel_X_list[var]);
+        loading_point[var].setX(m_aniStartX + m_relXList[var]);
     }
-    ani_timer->start();
+    m_aniTimer->start();
 }
 
 void X_Switch_Button::stopLoading()
 {
-    //设为可点击
+    // Set as clickable
     this->setDisabled(false);
-    ani_timer->stop();
+    m_aniTimer->stop();
     m_displayedWhenStopped = true;
     update();
 }
@@ -138,8 +137,8 @@ void X_Switch_Button::drawLoading(QPainter *painter)
     painter->setPen(Qt::NoPen);
 
     for (int var = 0; var < 8; ++var) {
-        QPen pen(loading_color);//定义画笔
-        pen.setWidth(1);//
+        QPen pen(loading_color); // Define pen
+        pen.setWidth(1);
         pen.setStyle(Qt::CustomDashLine);
         painter->setPen(pen);
         painter->setBrush(QBrush(loading_color, Qt::SolidPattern));
@@ -154,30 +153,29 @@ void X_Switch_Button::resizeEvent(QResizeEvent *ev)
 {
     Q_UNUSED(ev)
 
-    slider_width = qMin(width(), height()) - i_space * 2;
+    m_sliderWidth = qMin(width(), height()) - m_space * 2;
 #ifdef ENABLE_LOADING
-    m_outRadius = slider_width/2 + i_space;
-    m_inRadius = slider_width/2 - i_space*2;
+    m_outRadius = m_sliderWidth/2 + m_space;
+    m_inRadius = m_sliderWidth/2 - m_space*2;
 
-    int x_offset = slider_width/2 + i_space;
-    m_rel_X_list[0] = x_offset + m_inRadius;
-    m_rel_X_list[1] = x_offset + m_inRadius*3/4;
-    m_rel_X_list[2] = x_offset;
-    m_rel_X_list[3] = x_offset - m_inRadius*3/4;
-    m_rel_X_list[4] = x_offset - m_inRadius;
-    m_rel_X_list[5] = x_offset - m_inRadius*3/4;
-    m_rel_X_list[6] = x_offset;
-    m_rel_X_list[7] = x_offset + m_inRadius*3/4;
+    int x_offset = m_sliderWidth/2 + m_space;
+    m_relXList[0] = x_offset + m_inRadius;
+    m_relXList[1] = x_offset + m_inRadius*3/4;
+    m_relXList[2] = x_offset;
+    m_relXList[3] = x_offset - m_inRadius*3/4;
+    m_relXList[4] = x_offset - m_inRadius;
+    m_relXList[5] = x_offset - m_inRadius*3/4;
+    m_relXList[6] = x_offset;
+    m_relXList[7] = x_offset + m_inRadius*3/4;
 
-
-    loading_point[0] = QPoint(ani_StartX + m_rel_X_list[0], m_outRadius);//左
-    loading_point[1] = QPoint(ani_StartX + m_rel_X_list[1], m_outRadius-m_inRadius*3/4);//左上
-    loading_point[2] = QPoint(ani_StartX + m_rel_X_list[2], m_outRadius-m_inRadius);//上
-    loading_point[3] = QPoint(ani_StartX + m_rel_X_list[3], m_outRadius-m_inRadius*3/4);//右上
-    loading_point[4] = QPoint(ani_StartX + m_rel_X_list[4], m_outRadius);//右
-    loading_point[5] = QPoint(ani_StartX + m_rel_X_list[5], m_outRadius+m_inRadius*3/4);//右下
-    loading_point[6] = QPoint(ani_StartX + m_rel_X_list[6], m_outRadius+m_inRadius);//下
-    loading_point[7] = QPoint(ani_StartX + m_rel_X_list[7], m_outRadius+m_inRadius*3/4);//左下
+    loading_point[0] = QPoint(m_aniStartX + m_relXList[0], m_outRadius); // Left
+    loading_point[1] = QPoint(m_aniStartX + m_relXList[1], m_outRadius-m_inRadius*3/4); // Top-left
+    loading_point[2] = QPoint(m_aniStartX + m_relXList[2], m_outRadius-m_inRadius); // Top
+    loading_point[3] = QPoint(m_aniStartX + m_relXList[3], m_outRadius-m_inRadius*3/4); // Top-right
+    loading_point[4] = QPoint(m_aniStartX + m_relXList[4], m_outRadius); // Right
+    loading_point[5] = QPoint(m_aniStartX + m_relXList[5], m_outRadius+m_inRadius*3/4); // Bottom-right
+    loading_point[6] = QPoint(m_aniStartX + m_relXList[6], m_outRadius+m_inRadius); // Bottom
+    loading_point[7] = QPoint(m_aniStartX + m_relXList[7], m_outRadius+m_inRadius*3/4); // Bottom-left
 #endif
 }
 
@@ -185,18 +183,18 @@ void X_Switch_Button::paintEvent(QPaintEvent *ev)
 {
     Q_UNUSED(ev)
 
-    //启用反锯齿
+    // Enable anti-aliasing
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
-    //绘制背景
+    // Draw background
     drawBackGround(&painter);
 
-    //绘制滑块
+    // Draw slider
     drawSlider(&painter);
 
 #ifdef ENABLE_LOADING
-    //绘制加载动画
+    // Draw loading animation
     if(false == m_displayedWhenStopped)
         drawLoading(&painter);
 #endif
@@ -205,25 +203,25 @@ void X_Switch_Button::paintEvent(QPaintEvent *ev)
 
 void X_Switch_Button::statChanged()
 {
-    //计算步长
-    slide_Step = width() / 10;
+    // Calculate step
+    m_slideStep = width() / 10;
 
-    //计算滑块X轴终点坐标
-    if (b_checked) {
-        ani_EndX = width() - height();
+    // Calculate slider X end coordinate
+    if (m_checked) {
+        m_aniEndX = width() - height();
     } else {
-        ani_EndX = 0;
+        m_aniEndX = 0;
     }
 
-    //判断是否使用动画
-    if (b_animation) {
-        ani_timer->start();
+    // Check if animation is used
+    if (m_animation) {
+        m_aniTimer->start();
     } else{
-        ani_StartX = ani_EndX;
+        m_aniStartX = m_aniEndX;
         update();
     }
 
-    if (c_stateChangedCallback) c_stateChangedCallback(b_checked);
+    if (c_stateChangedCallback) c_stateChangedCallback(m_checked);
 }
 
 void X_Switch_Button::mousePressEvent(QMouseEvent *ev)
@@ -232,12 +230,13 @@ void X_Switch_Button::mousePressEvent(QMouseEvent *ev)
 
     //Q_UNUSED(ev)
 #ifdef ENABLE_LOADING
-    if(b_loading)
+    if (m_loading) {
         startLoading();
+    }
     else
 #endif
     {
-        b_checked = !b_checked;
+        m_checked = !m_checked;
         statChanged();
     }
 }
@@ -246,8 +245,8 @@ void X_Switch_Button::updateValue()
 {
 #ifdef ENABLE_LOADING
     if(false == m_displayedWhenStopped){
-        if(0 != ++ani_count%3) return;
-        ani_count = 0;
+        if(0 != ++m_aniCount%3) return;
+        m_aniCount = 0;
         int tmpInt = m_outRadiuslist[0];
         for (int var = 0; var < 7; var++) {
             m_outRadiuslist[var] = m_outRadiuslist[var+1];
@@ -256,19 +255,19 @@ void X_Switch_Button::updateValue()
     }else
 #endif
     {
-        if (b_checked) {
-            if (ani_StartX < ani_EndX) {
-                ani_StartX += slide_Step;
+        if (m_checked) {
+            if (m_aniStartX < m_aniEndX) {
+                m_aniStartX += m_slideStep;
             } else {
-                ani_StartX = ani_EndX;
-                ani_timer->stop();
+                m_aniStartX = m_aniEndX;
+                m_aniTimer->stop();
             }
         } else {
-            if (ani_StartX > ani_EndX) {
-                ani_StartX -= slide_Step;
+            if (m_aniStartX > m_aniEndX) {
+                m_aniStartX -= m_slideStep;
             } else {
-                ani_StartX = ani_EndX;
-                ani_timer->stop();
+                m_aniStartX = m_aniEndX;
+                m_aniTimer->stop();
             }
         }
     }
@@ -278,99 +277,100 @@ void X_Switch_Button::updateValue()
 
 int X_Switch_Button::space() const
 {
-    return i_space;
+    return m_space;
 }
 
 int X_Switch_Button::radius() const
 {
-    return i_radius;
+    return m_radius;
 }
 
 bool X_Switch_Button::checked() const
 {
-    return b_checked;
+    return m_checked;
 }
 
 bool X_Switch_Button::showText() const
 {
-    return b_showText;
+    return m_showText;
 }
 
 bool X_Switch_Button::animation() const
 {
-    return b_animation;
+    return m_animation;
 }
 
-QColor X_Switch_Button::bgcolor_on() const
+
+QColor X_Switch_Button::bgColorOn() const
 {
-    return bg_color_on;
+    return m_bgColorOn;
 }
 
-QColor X_Switch_Button::bgcolor_off() const
+QColor X_Switch_Button::bgColorOff() const
 {
-    return bg_color_off;
+    return m_bgColorOff;
 }
 
-QColor X_Switch_Button::slidercolor_on() const
+QColor X_Switch_Button::sliderColorOn() const
 {
-    return slider_color_on;
+    return m_sliderColorOn;
 }
 
-QColor X_Switch_Button::slidercolor_off() const
+QColor X_Switch_Button::sliderColorOff() const
 {
-    return slider_color_off;
+    return m_sliderColorOff;
 }
 
-QColor X_Switch_Button::textcolor() const
+QColor X_Switch_Button::textColor() const
 {
-    return text_color;
+    return m_textColor;
 }
 
-QString X_Switch_Button::textstr_on() const
+QString X_Switch_Button::textStrOn() const
 {
-    return text_str_on;
+    return m_textStrOn;
 }
 
-QString X_Switch_Button::textstr_off() const
+QString X_Switch_Button::textStrOff() const
 {
-    return text_str_off;
+    return m_textStrOff;
 }
 
 int X_Switch_Button::slideStep() const
 {
-    return slide_Step;
+    return m_slideStep;
 }
 
 int X_Switch_Button::aniStartX() const
 {
-    return ani_StartX;
+    return m_aniStartX;
 }
 
 int X_Switch_Button::aniEndX() const
 {
-    return ani_EndX;
+    return m_aniEndX;
 }
 
 void X_Switch_Button::setSpace(int space)
 {
-    if (i_space != space) {
-        i_space = space;
+    if (m_space != space) {
+        m_space = space;
         update();
     }
 }
 
 void X_Switch_Button::setRadius(int radius)
 {
-    if (i_radius != radius) {
-        i_radius = radius;
+    if (m_radius != radius) {
+        m_radius = radius;
         update();
     }
 }
 
 void X_Switch_Button::setChecked(bool checked)
 {
-    if (b_checked != checked) {
-        b_checked = checked;
+    if (m_checked != checked) {
+        m_checked = checked;
         update();
     }
 
@@ -382,82 +382,83 @@ void X_Switch_Button::setChecked(bool checked)
 
 #ifdef ENABLE_LOADING
 bool X_Switch_Button::loading(){
-    return b_loading;
+    return m_loading;
 }
 
 void X_Switch_Button::setLoading(bool enabled){
-    b_loading = enabled;
+    m_loading = enabled;
 }
 #endif
 
 void X_Switch_Button::setShowText(bool show)
 {
-    if (b_showText != show) {
-        b_showText = show;
+    if (m_showText != show) {
+        m_showText = show;
         update();
     }
 }
 
 void X_Switch_Button::setAnimation(bool ok)
 {
-    if (b_animation != ok) {
-        b_animation = ok;
+    if (m_animation != ok) {
+        m_animation = ok;
         update();
     }
 }
 
 void X_Switch_Button::setBgColorOn(const QColor &color)
 {
-    if (bg_color_on != color) {
-        bg_color_on = color;
+    if (m_bgColorOn != color) {
+        m_bgColorOn = color;
         update();
     }
 }
 
 void X_Switch_Button::setBgColorOff(const QColor &color)
 {
-    if (bg_color_off != color) {
-        bg_color_off = color;
+    if (m_bgColorOff != color) {
+        m_bgColorOff = color;
         update();
     }
 }
 
 void X_Switch_Button::setSliderColorOn(const QColor &color)
 {
-    if (slider_color_on != color) {
-        slider_color_on = color;
+    if (m_sliderColorOn != color) {
+        m_sliderColorOn = color;
         update();
     }
 }
 
 void X_Switch_Button::setSliderColorOff(const QColor &color)
 {
-    if (slider_color_off != color) {
-        slider_color_off = color;
+    if (m_sliderColorOff != color) {
+        m_sliderColorOff = color;
         update();
     }
 }
 
 void X_Switch_Button::setTextColor(const QColor &color)
 {
-    if (text_color != color) {
-        text_color = color;
+    if (m_textColor != color) {
+        m_textColor = color;
         update();
     }
 }
 
+
 void X_Switch_Button::setTextOn(const QString &text)
 {
-    if (text_str_on != text) {
-        text_str_on = text;
+    if (m_textStrOn != text) {
+        m_textStrOn = text;
         update();
     }
 }
 
 void X_Switch_Button::setTextOff(const QString &text)
 {
-    if (text_str_off != text) {
-        text_str_off = text;
+    if (m_textStrOff != text) {
+        m_textStrOff = text;
         update();
     }
 }

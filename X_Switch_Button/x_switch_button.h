@@ -21,6 +21,7 @@ private slots:
     void updateValue();
 
 private:
+    Q_DISABLE_COPY(X_Switch_Button)
     void drawBackGround(QPainter *painter);
     void drawSlider(QPainter *painter);
 
@@ -31,70 +32,68 @@ protected:
     void statChanged();
 
 private:
-    int i_space;                //滑块距离边界距离
-    int i_radius;               //圆角角度
+    int m_space;                // Distance from slider to edge
+    int m_radius;               // Corner radius
 
-    bool b_checked;             //是否选中
-    bool b_showText;            //是否显示文字
-    bool b_animation;           //是否使用动画
+    bool m_checked;             // Checked state
+    bool m_showText;            // Show text
+    bool m_animation;           // Use animation
 
     std::function<void(bool)> c_stateChangedCallback = nullptr;
 #ifdef ENABLE_LOADING
-    bool b_loading;             //是否使用加载动画
-
+    bool m_loading;             // Use loading animation
 
     QColor loading_color;
     QPoint loading_point[8];
     int m_inRadius;
     int m_outRadius;
     int m_outRadiuslist[8];
-    int m_rel_X_list[8];
-    bool m_displayedWhenStopped = true;//加载动画执行标志
-    int ani_count;              //动画计时器执行计数，控制loading帧率
+    int m_relXList[8];
+    bool m_displayedWhenStopped = true; // Loading animation running flag
+    int m_aniCount;              // Animation timer count, controls loading frame rate
 
     void startLoading();
     void stopLoading();
     void drawLoading(QPainter *painter);
 #endif
 
-    QColor bg_color_on;         //打开时候的背景色
-    QColor bg_color_off;        //关闭时候的背景色
-    QColor slider_color_on;     //打开时候滑块颜色
-    QColor slider_color_off;    //关闭时候滑块颜色
-    QColor text_color;          //文字颜色
+    QColor m_bgColorOn;         // Background color when ON
+    QColor m_bgColorOff;        // Background color when OFF
+    QColor m_sliderColorOn;     // Slider color when ON
+    QColor m_sliderColorOff;    // Slider color when OFF
+    QColor m_textColor;          // Text color
 
-    QString text_str_on;        //打开时候的文字
-    QString text_str_off;       //关闭时候的文字
+    QString m_textStrOn;        // Text when ON
+    QString m_textStrOff;       // Text when OFF
 
-    QTimer  *ani_timer;         //动画定时器
-    int     slide_Step;         //动画步长
-    int     slider_width;       //滑块宽度
-    int     ani_StartX;         //滑块开始X轴坐标
-    int     ani_EndX;           //滑块结束X轴坐标
+    QTimer  *m_aniTimer;         // Animation timer
+    int     m_slideStep;         // Animation step
+    int     m_sliderWidth;       // Slider width
+    int     m_aniStartX;         // Slider start X coordinate
+    int     m_aniEndX;           // Slider end X coordinate
 
 public:
-    int space()                 const;
-    int radius()                const;
-    bool checked()              const;
-    bool showText()             const;
-    bool animation()            const;
+    int space() const;
+    int radius() const;
+    bool checked() const;
+    bool showText() const;
+    bool animation() const;
 #ifdef ENABLE_LOADING
     bool loading();
 #endif
 
-    QColor bgcolor_on()         const;
-    QColor bgcolor_off()        const;
-    QColor slidercolor_on()      const;
-    QColor slidercolor_off()    const;
-    QColor textcolor()          const;
+    QColor bgColorOn() const;
+    QColor bgColorOff() const;
+    QColor sliderColorOn() const;
+    QColor sliderColorOff() const;
+    QColor textColor() const;
 
-    QString textstr_on()        const;
-    QString textstr_off()       const;
+    QString textStrOn() const;
+    QString textStrOff() const;
 
-    int slideStep()             const;
-    int aniStartX()             const;
-    int aniEndX()               const;
-
+    int slideStep() const;
+    int aniStartX() const;
+    int aniEndX() const;
 
 public Q_SLOTS:
     void setSpace(int space);

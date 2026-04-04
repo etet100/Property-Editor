@@ -1,10 +1,10 @@
-
-#include "x_switch_button.h"
+#include "xswitchbutton.h"
+#include <QFontMetrics>
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
 
-X_Switch_Button::X_Switch_Button(QWidget *parent) : QWidget(parent)
+XSwitchButton::XSwitchButton(QWidget *parent) : QWidget(parent)
 {
     m_space = 2;
     m_radius = 5;
@@ -29,7 +29,7 @@ X_Switch_Button::X_Switch_Button(QWidget *parent) : QWidget(parent)
 
     m_aniTimer = new QTimer(this);
     m_aniTimer->setInterval(30);
-    connect(m_aniTimer, &QTimer::timeout, this, &X_Switch_Button::updateValue);
+    connect(m_aniTimer, &QTimer::timeout, this, &XSwitchButton::updateValue);
 
 #ifdef ENABLE_LOADING
     m_loading = true;
@@ -45,9 +45,13 @@ X_Switch_Button::X_Switch_Button(QWidget *parent) : QWidget(parent)
     m_outRadiuslist[6] = 1;
     m_outRadiuslist[7] = 1;
 #endif
+
+    if (m_scaleWithFont) {
+        updateFixedSizeFromFont();
+    }
 }
 
-void X_Switch_Button::drawBackGround(QPainter *painter)
+void XSwitchButton::drawBackGround(QPainter *painter)
 {
     painter->save();
     painter->setPen(Qt::NoPen);
@@ -64,11 +68,13 @@ void X_Switch_Button::drawBackGround(QPainter *painter)
 
     // Left semicircle
     QPainterPath path1;
-    path1.addEllipse(rect.x(), rect.y(), side, side);
+    // path1.addEllipse(rect.x(), rect.y(), side, side);
+    path1.addRoundedRect(rect.x(), rect.y(), side, side, m_radius, m_radius);
 
     // Right semicircle
     QPainterPath path2;
-    path2.addEllipse(rect.width() - side, rect.y(), side, side);
+    // path2.addEllipse(rect.width() - side, rect.y(), side, side);
+    path2.addRoundedRect(rect.width() - side, rect.y(), side, side, m_radius, m_radius);
 
     // Middle rectangle
     QPainterPath path3;
@@ -83,17 +89,17 @@ void X_Switch_Button::drawBackGround(QPainter *painter)
     if (m_checked){
         QRect textRect(0, 0, width() - sliderWidth, height());
         painter->setPen(QPen(m_textColor));
-        if(showText()) painter->drawText(textRect, Qt::AlignCenter, m_textStrOn);
+        if (showText()) painter->drawText(textRect, Qt::AlignCenter, m_textStrOn);
     } else {
         QRect textRect(sliderWidth, 0, width() - sliderWidth, height());
         painter->setPen(QPen(m_textColor));
-        if(showText()) painter->drawText(textRect, Qt::AlignCenter, m_textStrOff);
+        if (showText()) painter->drawText(textRect, Qt::AlignCenter, m_textStrOff);
     }
 
     painter->restore();
 }
 
-void X_Switch_Button::drawSlider(QPainter *painter)
+void XSwitchButton::drawSlider(QPainter *painter)
 {
     painter->save();
     painter->setPen(Qt::NoPen);
@@ -104,13 +110,14 @@ void X_Switch_Button::drawSlider(QPainter *painter)
 
     m_sliderWidth = qMin(width(), height()) - m_space * 2;
     QRect rect(m_space + m_aniStartX, m_space, m_sliderWidth, m_sliderWidth);
-    painter->drawEllipse(rect);
+    // painter->drawEllipse(rect);
+    painter->drawRoundedRect(rect, m_radius * 0.8, m_radius * 0.8);
 
     painter->restore();
 }
 
 #ifdef ENABLE_LOADING
-void X_Switch_Button::startLoading()
+void XSwitchButton::startLoading()
 {
     // Set as not clickable
     this->setDisabled(true);
@@ -122,7 +129,7 @@ void X_Switch_Button::startLoading()
     m_aniTimer->start();
 }
 
-void X_Switch_Button::stopLoading()
+void XSwitchButton::stopLoading()
 {
     // Set as clickable
     this->setDisabled(false);
@@ -131,7 +138,7 @@ void X_Switch_Button::stopLoading()
     update();
 }
 
-void X_Switch_Button::drawLoading(QPainter *painter)
+void XSwitchButton::drawLoading(QPainter *painter)
 {
     painter->save();
     painter->setPen(Qt::NoPen);
@@ -149,11 +156,21 @@ void X_Switch_Button::drawLoading(QPainter *painter)
 }
 #endif
 
-void X_Switch_Button::resizeEvent(QResizeEvent *ev)
+void XSwitchButton::resizeEvent(QResizeEvent *ev)
 {
     Q_UNUSED(ev)
 
     m_sliderWidth = qMin(width(), height()) - m_space * 2;
+    m_slideStep = width() / 10;
+
+    if (m_checked) {
+        m_aniStartX = width() - height();
+        m_aniEndX = m_aniStartX;
+    } else {
+        m_aniStartX = 0;
+        m_aniEndX = 0;
+    }
+
 #ifdef ENABLE_LOADING
     m_outRadius = m_sliderWidth/2 + m_space;
     m_inRadius = m_sliderWidth/2 - m_space*2;
@@ -179,7 +196,7 @@ void X_Switch_Button::resizeEvent(QResizeEvent *ev)
 #endif
 }
 
-void X_Switch_Button::paintEvent(QPaintEvent *ev)
+void XSwitchButton::paintEvent(QPaintEvent *ev)
 {
     Q_UNUSED(ev)
 
@@ -198,10 +215,18 @@ void X_Switch_Button::paintEvent(QPaintEvent *ev)
     if(false == m_displayedWhenStopped)
         drawLoading(&painter);
 #endif
-
 }
 
-void X_Switch_Button::statChanged()
+void XSwitchButton::changeEvent(QEvent *ev)
+{
+    if (ev->type() == QEvent::FontChange && m_scaleWithFont) {
+        updateFixedSizeFromFont();
+    }
+
+    QWidget::changeEvent(ev);
+}
+
+void XSwitchButton::statChanged()
 {
     // Calculate step
     m_slideStep = width() / 10;
@@ -222,9 +247,10 @@ void X_Switch_Button::statChanged()
     }
 
     if (c_stateChangedCallback) c_stateChangedCallback(m_checked);
+    emit stateChanged(m_checked);
 }
 
-void X_Switch_Button::mousePressEvent(QMouseEvent *ev)
+void XSwitchButton::mousePressEvent(QMouseEvent *ev)
 {
     if (ev->button() != Qt::MouseButton::LeftButton) return;
 
@@ -241,7 +267,7 @@ void X_Switch_Button::mousePressEvent(QMouseEvent *ev)
     }
 }
 
-void X_Switch_Button::updateValue()
+void XSwitchButton::updateValue()
 {
 #ifdef ENABLE_LOADING
     if(false == m_displayedWhenStopped){
@@ -275,83 +301,101 @@ void X_Switch_Button::updateValue()
     update();
 }
 
-int X_Switch_Button::space() const
+QSize XSwitchButton::sizeHint() const
+{
+    int h;
+    if (m_scaleWithFont) {
+        QFontMetrics fm(font());
+        h = qRound(fm.height() * m_fontScaleFactor);
+    } else {
+        h = 20;
+    }
+    int w = h * 2;
+
+    return QSize(w, h);
+}
+
+QSize XSwitchButton::minimumSizeHint() const
+{
+    return sizeHint();
+}
+
+int XSwitchButton::space() const
 {
     return m_space;
 }
 
-int X_Switch_Button::radius() const
+int XSwitchButton::radius() const
 {
     return m_radius;
 }
 
-bool X_Switch_Button::checked() const
+bool XSwitchButton::checked() const
 {
     return m_checked;
 }
 
-bool X_Switch_Button::showText() const
+bool XSwitchButton::showText() const
 {
     return m_showText;
 }
 
-bool X_Switch_Button::animation() const
+bool XSwitchButton::animation() const
 {
     return m_animation;
 }
 
-
-QColor X_Switch_Button::bgColorOn() const
+QColor XSwitchButton::bgColorOn() const
 {
     return m_bgColorOn;
 }
 
-QColor X_Switch_Button::bgColorOff() const
+QColor XSwitchButton::bgColorOff() const
 {
     return m_bgColorOff;
 }
 
-QColor X_Switch_Button::sliderColorOn() const
+QColor XSwitchButton::sliderColorOn() const
 {
     return m_sliderColorOn;
 }
 
-QColor X_Switch_Button::sliderColorOff() const
+QColor XSwitchButton::sliderColorOff() const
 {
     return m_sliderColorOff;
 }
 
-QColor X_Switch_Button::textColor() const
+QColor XSwitchButton::textColor() const
 {
     return m_textColor;
 }
 
-QString X_Switch_Button::textStrOn() const
+QString XSwitchButton::textStrOn() const
 {
     return m_textStrOn;
 }
 
-QString X_Switch_Button::textStrOff() const
+QString XSwitchButton::textStrOff() const
 {
     return m_textStrOff;
 }
 
-int X_Switch_Button::slideStep() const
+int XSwitchButton::slideStep() const
 {
     return m_slideStep;
 }
 
-int X_Switch_Button::aniStartX() const
+int XSwitchButton::aniStartX() const
 {
     return m_aniStartX;
 }
 
-int X_Switch_Button::aniEndX() const
+int XSwitchButton::aniEndX() const
 {
     return m_aniEndX;
 }
 
-void X_Switch_Button::setSpace(int space)
+void XSwitchButton::setSpace(int space)
 {
     if (m_space != space) {
         m_space = space;
@@ -359,7 +403,7 @@ void X_Switch_Button::setSpace(int space)
     }
 }
 
-void X_Switch_Button::setRadius(int radius)
+void XSwitchButton::setRadius(int radius)
 {
     if (m_radius != radius) {
         m_radius = radius;
@@ -367,7 +411,7 @@ void X_Switch_Button::setRadius(int radius)
     }
 }
 
-void X_Switch_Button::setChecked(bool checked)
+void XSwitchButton::setChecked(bool checked)
 {
     if (m_checked != checked) {
         m_checked = checked;
@@ -381,16 +425,16 @@ void X_Switch_Button::setChecked(bool checked)
 }
 
 #ifdef ENABLE_LOADING
-bool X_Switch_Button::loading(){
+bool XSwitchButton::loading(){
     return m_loading;
 }
 
-void X_Switch_Button::setLoading(bool enabled){
+void XSwitchButton::setLoading(bool enabled){
     m_loading = enabled;
 }
 #endif
 
-void X_Switch_Button::setShowText(bool show)
+void XSwitchButton::setShowText(bool show)
 {
     if (m_showText != show) {
         m_showText = show;
@@ -398,7 +442,7 @@ void X_Switch_Button::setShowText(bool show)
     }
 }
 
-void X_Switch_Button::setAnimation(bool ok)
+void XSwitchButton::setAnimation(bool ok)
 {
     if (m_animation != ok) {
         m_animation = ok;
@@ -406,7 +450,7 @@ void X_Switch_Button::setAnimation(bool ok)
     }
 }
 
-void X_Switch_Button::setBgColorOn(const QColor &color)
+void XSwitchButton::setBgColorOn(const QColor &color)
 {
     if (m_bgColorOn != color) {
         m_bgColorOn = color;
@@ -414,7 +458,7 @@ void X_Switch_Button::setBgColorOn(const QColor &color)
     }
 }
 
-void X_Switch_Button::setBgColorOff(const QColor &color)
+void XSwitchButton::setBgColorOff(const QColor &color)
 {
     if (m_bgColorOff != color) {
         m_bgColorOff = color;
@@ -422,7 +466,7 @@ void X_Switch_Button::setBgColorOff(const QColor &color)
     }
 }
 
-void X_Switch_Button::setSliderColorOn(const QColor &color)
+void XSwitchButton::setSliderColorOn(const QColor &color)
 {
     if (m_sliderColorOn != color) {
         m_sliderColorOn = color;
@@ -430,7 +474,7 @@ void X_Switch_Button::setSliderColorOn(const QColor &color)
     }
 }
 
-void X_Switch_Button::setSliderColorOff(const QColor &color)
+void XSwitchButton::setSliderColorOff(const QColor &color)
 {
     if (m_sliderColorOff != color) {
         m_sliderColorOff = color;
@@ -438,7 +482,7 @@ void X_Switch_Button::setSliderColorOff(const QColor &color)
     }
 }
 
-void X_Switch_Button::setTextColor(const QColor &color)
+void XSwitchButton::setTextColor(const QColor &color)
 {
     if (m_textColor != color) {
         m_textColor = color;
@@ -446,8 +490,7 @@ void X_Switch_Button::setTextColor(const QColor &color)
     }
 }
 
-
-void X_Switch_Button::setTextOn(const QString &text)
+void XSwitchButton::setTextOn(const QString &text)
 {
     if (m_textStrOn != text) {
         m_textStrOn = text;
@@ -455,10 +498,51 @@ void X_Switch_Button::setTextOn(const QString &text)
     }
 }
 
-void X_Switch_Button::setTextOff(const QString &text)
+void XSwitchButton::setTextOff(const QString &text)
 {
     if (m_textStrOff != text) {
         m_textStrOff = text;
         update();
     }
+}
+
+bool XSwitchButton::scaleWithFont() const
+{
+    return m_scaleWithFont;
+}
+
+void XSwitchButton::setScaleWithFont(bool enabled)
+{
+    if (m_scaleWithFont != enabled) {
+        m_scaleWithFont = enabled;
+        if (m_scaleWithFont) {
+            updateFixedSizeFromFont();
+        } else {
+            setMinimumSize(0, 0);
+            setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        }
+    }
+}
+
+double XSwitchButton::fontScaleFactor() const
+{
+    return m_fontScaleFactor;
+}
+
+void XSwitchButton::setFontScaleFactor(double factor)
+{
+    if (!qFuzzyCompare(m_fontScaleFactor, factor)) {
+        m_fontScaleFactor = factor;
+        if (m_scaleWithFont) {
+            updateFixedSizeFromFont();
+        }
+    }
+}
+
+void XSwitchButton::updateFixedSizeFromFont()
+{
+    QFontMetrics fm(font());
+    int h = qRound(fm.height() * m_fontScaleFactor);
+    int w = h * 2;
+    setFixedSize(w, h);
 }

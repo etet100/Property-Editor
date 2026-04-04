@@ -26,7 +26,7 @@ SOURCES += $$PWD/CPropertyEditor.cpp \
     $$PWD/CDateTimeProperty.cpp \
     $$PWD/QExtDoubleSpinBox.cpp \
     $$PWD/QExtSpinbox.cpp \
-    $$PWD/X_Switch_Button/x_switch_button.cpp
+    $$PWD/X_Switch_Button/xswitchbutton.cpp
 
 HEADERS  += $$PWD/CPropertyEditor.h \
     $$PWD/CBoolProperty.h \
@@ -47,7 +47,8 @@ HEADERS  += $$PWD/CPropertyEditor.h \
     $$PWD/CDateTimeProperty.h \
     $$PWD/QExtDoubleSpinBox.h \
     $$PWD/QExtSpinBox.h \
-    $$PWD/X_Switch_Button/x_switch_button.h
+    $$PWD/X_Switch_Button/xswitchbutton.h \
+    $$PWD/X_Switch_Button/customwidgetsshared.h
 
 INCLUDEPATH += .
 

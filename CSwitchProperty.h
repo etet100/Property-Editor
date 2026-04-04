@@ -3,7 +3,7 @@
 #define CSWITCHPROPERTY_H
 
 #include "CBaseProperty.h"
-#include "X_Switch_Button/x_switch_button.h"
+#include "X_Switch_Button/xswitchbutton.h"
 
 class CSwitchProperty : public CBaseProperty
 {
@@ -23,7 +23,7 @@ class CSwitchProperty : public CBaseProperty
     protected:
         bool m_value;
         bool m_defaultValue;
-        X_Switch_Button *m_switch;
+        XSwitchButton *m_switch;
 };
 
 #endif // CSWITCHPROPERTY_H

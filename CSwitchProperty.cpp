@@ -30,7 +30,7 @@ QWidget *CSwitchProperty::createSwitch()
     QVBoxLayout *layout = new QVBoxLayout(container);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    m_switch = new X_Switch_Button(container);
+    m_switch = new XSwitchButton(container);
     m_switch->setFixedSize(35, 16);
     m_switch->setTextOff("");
     m_switch->setTextOn("");

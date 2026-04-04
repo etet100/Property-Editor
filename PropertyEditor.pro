@@ -25,5 +25,6 @@ install_propertyeditor.files = PropertyEditor/PropertyEditor.dll
 INSTALLS += install_propertyeditor
 
 DISTFILES += \
-    PropertyEditor.pri \
-    X_Switch_Button/x_switch_button.gif
+    PropertyEditor.pri
+
+DESTDIR = $$OUT_PWD/../../gpilot

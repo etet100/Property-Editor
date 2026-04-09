@@ -9,6 +9,8 @@
 
 // #define ENABLE_LOADING 1
 
+namespace PropertyEditor {
+
 class CUSTOMWIDGETS_DLLSPEC XSwitchButton : public QWidget
 {
     Q_OBJECT
@@ -151,5 +153,7 @@ public Q_SLOTS:
 
 
 };
+
+} // namespace PropertyEditor
 
 #endif // XSWITCHBUTTON_H

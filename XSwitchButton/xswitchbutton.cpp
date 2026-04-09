@@ -4,6 +4,8 @@
 #include <QPainterPath>
 #include <QMouseEvent>
 
+namespace PropertyEditor {
+
 XSwitchButton::XSwitchButton(QWidget *parent) : QWidget(parent)
 {
     m_space = 2;
@@ -546,3 +548,5 @@ void XSwitchButton::updateFixedSizeFromFont()
     int w = h * 2;
     setFixedSize(w, h);
 }
+
+} // namespace PropertyEditor
